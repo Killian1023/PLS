@@ -6,11 +6,19 @@
 #include <sys/wait.h>
 
 typedef struct {
+    struct Order *next;
     char OrderID[10];
     char StartDate[10];
     int OrderNUM;
     char ProductID[20];
 } Order;
+
+Order *head = NULL; 
+
+typedef struct {
+    char start_date[10];
+    char end_date[10];
+} Period;
 
 // Function declarations
 void logInput(const char* input);
@@ -22,6 +30,7 @@ void printReport(const char *filename);
 void addBatch(const char *filename);
 
 int main() {
+
     while(1) {
         char input[200];
         printf("Please enter:\n> ");
@@ -40,6 +49,7 @@ int main() {
             if (strcmp(command, "addPERIOD") == 0) {
                 char *startDate = strtok(NULL, " ");
                 char *endDate = strtok(NULL, "\n");
+                Period period = {startDate, endDate};
                 updatePeriod(startDate, endDate);
             } else if (strcmp(command, "addORDER") == 0) {
                 char *orderId = strtok(NULL, " ");
@@ -59,6 +69,16 @@ int main() {
             } else {
                 printf("Unknown command.\n");
             }
+        }
+
+        int i = 0;
+
+        Order *current = head;
+        while (current != NULL) {
+            i += 1;
+            printf("Number: %d OrderID: %s, StartDate: %s, OrderNUM: %d, ProductID: %s\n", 
+                   i,current->OrderID, current->StartDate, current->OrderNUM, current->ProductID);
+            current = current->next;
         }
     }
     return 0;
@@ -142,6 +162,34 @@ void addOrder(const char *orderId, const char *orderDate, int orderNum, const ch
     }
     fprintf(file, "%s\n", input);
     fclose(file);
+
+    Order *newOrder = (Order *)malloc(sizeof(Order));
+    if (!newOrder) {
+        perror("Failed to allocate memory for new order");
+        return;
+    }
+
+    // Properly copy data into the new order
+    strncpy(newOrder->OrderID, orderId, sizeof(newOrder->OrderID) - 1);
+    newOrder->OrderID[sizeof(newOrder->OrderID) - 1] = '\0';
+    strncpy(newOrder->StartDate, orderDate, sizeof(newOrder->StartDate) - 1);
+    newOrder->StartDate[sizeof(newOrder->StartDate) - 1] = '\0';
+    newOrder->OrderNUM = orderNum;
+    strncpy(newOrder->ProductID, productId, sizeof(newOrder->ProductID) - 1);
+    newOrder->ProductID[sizeof(newOrder->ProductID) - 1] = '\0';
+    newOrder->next = NULL;
+
+    if (head == NULL) {
+        head = newOrder;
+    } else {
+        Order *current = head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->next = newOrder;
+    }
+
+
 }
 
 void runPLS(const char *algorithm) {
