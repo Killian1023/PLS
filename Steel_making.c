@@ -119,12 +119,21 @@ void updatePeriod(const char *startDate, const char *endDate) {
 }
 
 
-void addPeriod(const char *startDate, const char *endDate) {
-    printf("Adding period from %s to %s\n", startDate, endDate);
-    // The period updating functionality is assumed to be handled within logInput for this example
-    char input[100];
-    snprintf(input, sizeof(input), "start_date=%s\nend_date=%s\n", startDate, endDate);
-    // This directly logs the period; in a real application, you might adjust to ensure the period is updated correctly
+// void addPeriod(const char *startDate, const char *endDate) {
+//     printf("Adding period from %s to %s\n", startDate, endDate);
+//     // The period updating functionality is assumed to be handled within logInput for this example
+//     char logEntry[100];
+//     snprintf(logEntry, sizeof(logEntry), "start_date=%s\nend_date=%s\n", startDate, endDate);
+//     // This directly logs the period; in a real application, you might adjust to ensure the period is updated correctly
+//     logInput(logEntry);
+// }
+
+void addOrder(const char *orderId, const char *orderDate, int orderNum, const char *productId) {
+    printf("Adding order %s, Date: %s, Number: %d, Product: %s\n", orderId, orderDate, orderNum, productId);
+    char input[200];
+    snprintf(input, sizeof(input), 
+             "[ORDER]\nOrderID=%s\nStartDate=%s\nOrderNUM=%d\nProductID=%s\n", 
+             orderId, orderDate, orderNum, productId);
     const char* filename = "scheduler.log";
     FILE* file = fopen(filename, "a");
     if (file == NULL) {
@@ -133,15 +142,6 @@ void addPeriod(const char *startDate, const char *endDate) {
     }
     fprintf(file, "%s\n", input);
     fclose(file);
-}
-
-void addOrder(const char *orderId, const char *orderDate, int orderNum, const char *productId) {
-    printf("Adding order %s, Date: %s, Number: %d, Product: %s\n", orderId, orderDate, orderNum, productId);
-    char logEntry[200];
-    snprintf(logEntry, sizeof(logEntry), 
-             "[ORDER]\nOrderID=%s\nStartDate=%s\nOrderNUM=%d\nProductID=%s\n", 
-             orderId, orderDate, orderNum, productId);
-    logInput(logEntry);
 }
 
 void runPLS(const char *algorithm) {
